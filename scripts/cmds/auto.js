@@ -5,16 +5,16 @@ const request = require("request");
 module.exports = {
   config: {
     name: 'auto',
-    version: '5.0',
+    version: '5.1',
     author: 'MR᭄﹅ MAHABUB﹅ メꪜ',
     countDown: 5,
     role: 0,
-    shortDescription: 'auto video downloader',
+    shortDescription: 'Always active auto video download for any URL',
     category: 'media',
   },
 
   onStart: async function ({ api, event }) {
-    return api.sendMessage("𝐈𝐧𝐬𝐞𝐫𝐭 𝐥𝐢𝐧𝐤 🤏", event.threadID);
+    return api.sendMessage("✅ AutoLink is always active. Just send any link!", event.threadID);
   },
 
   onChat: async function ({ api, event }) {
@@ -24,37 +24,34 @@ module.exports = {
     const linkMatch = message.match(/(https?:\/\/[^\s]+)/);
     if (!linkMatch) return;
 
-    const sumaiya = linkMatch[0];
-    api.setMessageReaction("♻", event.messageID, () => {}, true);
+    const url = linkMatch[0];
+    api.setMessageReaction("⏳", event.messageID, () => {}, true);
 
     try {
-      
-      const jsonRes = await axios.get("https://raw.githubusercontent.com/MR-MAHABUB-004/MAHABUB-BOT-STORAGE/refs/heads/main/APIURL.json");
-      const mahhabub4xBase = jsonRes.data.Alldl;
+      const response = await axios.get(`https://nayan-video-downloader.vercel.app/alldown?url=${encodeURIComponent(url)}`);
+      const { title, high, low } = response.data.data;
 
-      
-      const response = await axios.get(`${mahhabub4xBase}${encodeURIComponent(sumaiya)}`);
-      const { title, downloadurlX } = response.data;
-
-      if (!downloadurlX) {
-        api.setMessageReaction("✖", event.messageID, () => {}, true);
+      if (!high && !low) {
+        api.setMessageReaction("😞", event.messageID, () => {}, true); 
         return api.sendMessage("", threadID, event.messageID);
       }
 
-      
-      request(downloadurlX)
-        .pipe(fs.createWriteStream("video.mp4"))
-        .on("close", () => {
-          api.setMessageReaction("✔", event.messageID, () => {}, true);
-          api.sendMessage({
-            body: `╭──────────────────◊\n\n《𝐓𝐢𝐭𝐥𝐞》: ${title || "𝐔𝐧𝐟𝐢𝐧𝐝 💔"}\n\n╰──────────────────◊`,
-            attachment: fs.createReadStream("video.mp4")
-          }, threadID, () => fs.unlinkSync("video.mp4"));
-        });
+      const videoUrl = high || low;
+
+      const imgurRes = await axios.get(`https://imgur-upload-psi.vercel.app/mahabub?url=${encodeURIComponent(videoUrl)}`);
+      const imgurLink = imgurRes.data.url || "N/A";
+
+      request(videoUrl).pipe(fs.createWriteStream("video.mp4")).on("close", () => {
+        api.setMessageReaction("✅", event.messageID, () => {}, true); 
+        api.sendMessage({
+          body: `╭──────────────────◊\n\n\n《TITLE》: ${title || "No Title"}\n\n🌐 《IMGUR》: ${imgurLink}\n\n\n╰──────────────────◊`,
+          attachment: fs.createReadStream("video.mp4")
+        }, threadID, () => fs.unlinkSync("video.mp4"));
+      });
 
     } catch (err) {
-      console.error("Download Error:", err.response?.data || err.message || err);
-      api.setMessageReaction("✖", event.messageID, () => {}, true);
+      console.error("Download Error:", err);
+      api.setMessageReaction("😞", event.messageID, () => {}, true); 
       api.sendMessage("", threadID, event.messageID);
     }
   }

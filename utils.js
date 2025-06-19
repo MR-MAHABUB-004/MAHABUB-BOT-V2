@@ -524,29 +524,63 @@ async function getStreamsFromAttachment(attachments) {
 	return streams;
 }
 
+
+
+
+
+
+
 async function getStreamFromURL(url = "", pathName = "", options = {}) {
 	if (!options && typeof pathName === "object") {
 		options = pathName;
 		pathName = "";
 	}
+
+	// Convert imgur page to direct link
+	if (typeof url === "string" && url.includes("imgur.com") && !url.includes("i.imgur.com")) {
+		const match = url.match(/imgur\.com\/([a-zA-Z0-9]+)(\.(jpg|png|gif|mp4))?/);
+		if (match) {
+			const ext = match[2] ? match[2].replace('.', '') : "jpg";
+			url = `https://i.imgur.com/${match[1]}.${ext}`;
+		}
+	}
+
 	try {
 		if (!url || typeof url !== "string")
 			throw new Error(`The first argument (url) must be a string`);
+
 		const response = await axios({
 			url,
 			method: "GET",
 			responseType: "stream",
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', // helps bypass 429 on Imgur
+				...options.headers
+			},
 			...options
 		});
-		if (!pathName)
-			pathName = utils.randomString(10) + (response.headers["content-type"] ? '.' + utils.getExtFromMimeType(response.headers["content-type"]) : ".noext");
+
+		if (!pathName) {
+			const contentType = response.headers["content-type"];
+			const ext = contentType ? '.' + utils.getExtFromMimeType(contentType) : ".noext";
+			pathName = utils.randomString(10) + ext;
+		}
+
 		response.data.path = pathName;
 		return response.data;
-	}
-	catch (err) {
+	} catch (err) {
+		// Optional: inspect err.response?.status === 429 and handle retry
 		throw err;
 	}
 }
+
+
+
+
+
+
+
+
 
 async function translate(text, lang) {
 	if (typeof text !== "string")

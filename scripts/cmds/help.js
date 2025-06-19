@@ -3,115 +3,111 @@ const axios = require("axios");
 const path = require("path");
 const { getPrefix } = global.utils;
 const { commands, aliases } = global.GoatBot;
-const doNotDelete = "『[✰MAHABUB💌』"; // don't change name
 
 module.exports = {
   config: {
     name: "help",
-    version: "1.17",
-    author: " MR᭄﹅ MAHABUB﹅ メꪜ", // original author
+    version: "2.2",
+    author: "MR᭄﹅ MAHABUB﹅ メꪜ",
     countDown: 0,
     role: 0,
     shortDescription: {
-      en: "View command usage and list all commands directly",
+      en: "Fancy command list and help menu",
     },
     longDescription: {
-      en: "View command usage and list all commands directly",
+      en: "Displays the command list with a stylish look and shows command usage.",
     },
     category: "info",
     guide: {
-      en: "{pn} / help cmdName ",
+      en: "{pn} or {pn} commandName",
     },
     priority: 1,
   },
 
   onStart: async function ({ message, args, event, threadsData, role }) {
-    const { threadID } = event;
-    const threadData = await threadsData.get(threadID);
+    const { threadID, messageID } = event;
     const prefix = getPrefix(threadID);
+
+    // Send wait message
+    const waitingMsg = await message.reply("⏳ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ғᴇᴡ sᴇᴄᴏɴᴅs...");
 
     if (args.length === 0) {
       const categories = {};
       let msg = "";
 
-      msg += `╔═════▓࿇࿇▓═════╗\n             𝐀𝐋𝐋 𝐂𝐌𝐃 𝐋𝐈𝐒𝐓 𝗜𝗡 𝗠𝗔𝗛𝗔𝗕𝗨𝗕-𝗕𝗢𝗧\n╚═════▓࿇࿇▓═════╝\n\n`;
+      msg += `╔═━━━━✪〘 𝙈𝘼𝙃𝘼𝘽𝙐𝘽-𝘽𝙊𝙏 𝘾𝙈𝘿𝙎 〙✪━━━━═╗\n`;
 
       for (const [name, value] of commands) {
         if (value.config.role > 1 && role < value.config.role) continue;
         const category = value.config.category || "Uncategorized";
-        categories[category] = categories[category] || { commands: [] };
-        categories[category].commands.push(name);
+        if (!categories[category]) categories[category] = [];
+        categories[category].push(name);
       }
 
-      Object.keys(categories).forEach((category) => {
-        if (category !== "info") {
-          msg += `\n➪ ༆─☞︎︎︎ [${category.toUpperCase()}] 》👑`;
-          const names = categories[category].commands.sort();
-          for (let i = 0; i < names.length; i += 3) {
-            const cmds = names.slice(i, i + 3).map((item) => ` ✯${item}|\n`);
-            msg += `\n ${cmds.join(" ".repeat(Math.max(1, 10 - cmds.join("").length)))}`;
-          }
+      for (const category of Object.keys(categories)) {
+        msg += `\n╭───▣【 𝙲𝘼𝚃𝙴𝙶𝙾𝚁𝚈: 𝙁𝙖𝙣𝙘𝙮 ${category.toUpperCase()} 】▣───╮\n`;
+        const cmds = categories[category].sort();
+        for (let i = 0; i < cmds.length; i += 3) {
+          const line = cmds.slice(i, i + 3).map(cmd => `★${cmd}`).join("    ");
+          msg += `│ ${line}\n`;
         }
-      });
+        msg += `╰────────────────────────────╯\n`;
+      }
 
-      const totalCommands = commands.size;
-      msg += `\n𝗧𝗢𝗧𝗔𝗟 𝙲𝚖𝚍 ${totalCommands}\n𝚌𝚘𝚖𝚖𝚊𝚗𝚍𝚜 𝚢𝚘𝚞 𝚌𝚊𝚗 𝚞𝚜𝚎 𝙼𝚊𝚑𝚊𝚋𝚞𝚋-𝙱𝚘𝚝 -`;
-      msg += `𝚝𝚢𝚙𝚎: 「${prefix} 𝗵𝗲𝗹𝗽」+「 𝐇𝐄𝐋𝐏 𝐂𝐌𝐃」𝚝𝚘 𝚟𝚒𝚎𝚠 𝚍𝚎𝚝𝚊𝚒𝚕𝚜 𝚘𝚏 𝚌𝚘𝚖𝚖𝚊𝚗𝚍𝚜\n`;
-      msg += `👑 | 𝐓𝐇𝐀𝐍𝐊𝐒 𝐅𝐎𝐑 𝐔𝐒𝐈𝐍𝐆 𝗠𝗔𝗛𝗔𝗕𝗨𝗕-𝐁𝐎𝐓 𝐖𝐄'𝐋𝐋 𝐂𝐎𝐌𝐄 𝐖𝐈𝐓𝐇 𝐍𝐄𝐖 𝐔𝐏𝐃𝐀𝐓𝐄 𝐄𝐕𝐄𝐑𝐘 𝐖𝐄𝐄𝐊`;
+      msg += `\n➤ 𝙏𝙊𝙏𝘼𝙇 𝘾𝙈𝘿𝙎: ${commands.size}`;
+      msg += `\n➤ 𝙐𝙎𝘼𝙂𝙀: ${prefix}help [command name]`;
+      msg += `\n➤ 𝘽𝙊𝙏 𝙊𝙒𝙉𝙀𝙍: 𝙈𝘼𝙃𝘼𝘽𝙐𝘽 𝙍𝘼𝙃𝙈𝘼𝙉`;
+      msg += `\n➤ 𝙐𝙋𝘿𝘼𝙏𝙀𝙎 𝙀𝙑𝙀𝙍𝙔 𝙒𝙀𝙀𝙆\n`;
+      msg += `╚═━「 𝘽𝙊𝙏 𝘽𝙔 𝙈𝙍.𝙈𝘼𝙃𝘼𝘽𝙐𝘽 」━═╝`;
 
-      // Get video from API
-      const res = await axios.get("https://mahabub-apis.vercel.app/help");
-      const helpVideo = res.data.data;
+      let attachment = null;
+      try {
+        const res = await axios.get("https://mahabub-apis.vercel.app/help");
+        attachment = await global.utils.getStreamFromURL(res.data.data);
+      } catch (err) {
+        console.error("Video not loaded:", err.message);
+      }
 
-      await message.reply({
-        body: msg,
-        attachment: await global.utils.getStreamFromURL(helpVideo),
-      });
-
+      await message.reply({ body: msg, attachment });
     } else {
       const commandName = args[0].toLowerCase();
       const command = commands.get(commandName) || commands.get(aliases.get(commandName));
+      if (!command) return message.reply(`⚠️ Command "${commandName}" not found.`);
 
-      if (!command) {
-        await message.reply(`Command "${commandName}" not found.`);
-      } else {
-        const configCommand = command.config;
-        const roleText = roleTextToString(configCommand.role);
-        const author = configCommand.author || "Unknown";
-        const longDescription = configCommand.longDescription ? configCommand.longDescription.en || "No description" : "No description";
-        const guideBody = configCommand.guide?.en || "No guide available.";
-        const usage = guideBody
-          .replace(/{p}/g, prefix)
-          .replace(/{n}/g, configCommand.name)
-          .replace(/{pn}/g, prefix + configCommand.name);
+      const config = command.config;
+      const usage = config.guide?.en
+        ?.replace(/{p}/g, prefix)
+        ?.replace(/{n}/g, config.name)
+        ?.replace(/{pn}/g, prefix + config.name) || "No usage guide available.";
 
-        const response = `╭── 𝐍𝐀𝐌𝐄 𝐎𝐖𝐍𝐄𝐑 - 𝗠𝗔𝗛𝗔𝗕𝗨𝗕 𝗥𝗔𝗛𝗠𝗔𝗡 ────⭓
-  │ ${configCommand.name}
-  ├── INFO
-  │ Description: ${longDescription}
-  │ Other names: ${configCommand.aliases ? configCommand.aliases.join(", ") : "Do not have"}
-  │ Version: ${configCommand.version || "1.0"}
-  │ Role: ${roleText}
-  │ Time per command: ${configCommand.countDown || 1}s
-  │ Author: ${author}
-  ├── Usage
-  │ ${usage}
-  ├── Notes
-  │ THIS BOT HAS BEEN MADE BY MR᭄﹅ MAHABUB﹅ メꪜ
-  │ FOR ANY HELP YOU CAN CONTACT OWNER: https://www.facebook.com/www.xnxx.com140
-  ╰━━━━━━━❖`;
+      const aliasesList = config.aliases?.join(", ") || "None";
+      const roleText = roleTextToString(config.role);
+      const description = config.longDescription?.en || "No description.";
 
-        await message.reply(response);
-      }
+      const msg = `╭───✦ 𝘾𝙊𝙈𝙈𝘼𝙉𝘿 𝘿𝙀𝙏𝘼𝙄𝙇𝙎 ✦───╮
+│ ✧ 𝙉𝘼𝙈𝙀: ${config.name}
+│ ✧ 𝘿𝙀𝙎𝘾: ${description}
+│ ✧ 𝘼𝙇𝙄𝘼𝙎𝙀𝙎: ${aliasesList}
+│ ✧ 𝙑𝙀𝙍𝙎𝙄𝙊𝙉: ${config.version || "1.0"}
+│ ✧ 𝙍𝙊𝙇𝙀: ${roleText}
+│ ✧ 𝘾𝙊𝙊𝙇𝘿𝙊𝙒𝙉: ${config.countDown || 1}s
+│ ✧ 𝘼𝙐𝙏𝙃𝙊𝙍: ${config.author || "Unknown"}
+│ ✧ 𝙐𝙎𝘼𝙂𝙀: ${usage}
+╰────────────────────────╯`;
+
+      await message.reply(msg);
     }
+
+    // Optionally delete wait message if you want:
+    // global.api.unsendMessage(waitingMsg.messageID);
   },
 };
 
-function roleTextToString(roleText) {
-  switch (roleText) {
-    case 0: return "0 (All users)";
-    case 1: return "1 (Group administrators)";
-    case 2: return "2 (Admin bot)";
-    default: return "Unknown role";
+function roleTextToString(roleLevel) {
+  switch (roleLevel) {
+    case 0: return "All users";
+    case 1: return "Group admins";
+    case 2: return "Bot admins";
+    default: return "Unknown";
   }
 }

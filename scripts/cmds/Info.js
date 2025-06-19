@@ -5,7 +5,7 @@ module.exports = {
     config: {
         name: "info",
         aliases: ["inf", "in4"],
-        version: "2.5",
+        version: "2.6",
         author: "MR᭄﹅ MAHABUB﹅ メꪜ",
         countDown: 5,
         role: 0,
@@ -26,17 +26,17 @@ module.exports = {
     },
 
     sendInfo: async function (message) {
-        message.reply("Wait baby... Loading author info 😘").then(async (waitMsg) => {
+        message.reply("𝑾𝒂𝒊𝒕 𝒃𝒂𝒃𝒚... 𝑳𝒐𝒂𝒅𝒊𝒏𝒈 𝒂𝒖𝒕𝒉𝒐𝒓 𝒊𝒏𝒇𝒐 😘").then(async (waitMsg) => {
             setTimeout(() => {
                 message.unsend(waitMsg.messageID);
-            }, 4000); // Unsend after 4 seconds
+            }, 4000);
 
-            const botName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕-𝗕𝗢𝗧";
+            const botName = "𝑴𝑨𝑯𝑨𝑩𝑼𝑩-𝑩𝑶𝑻";
             const botPrefix = "/";
-            const authorName = "𝗠𝗔𝗛𝗔𝗕𝗨𝗕 𝗥𝗔𝗛𝗠𝗔𝗡";
-            const authorFB = "https://www.facebook.com/www.xnxx.com140";  
+            const authorName = "𝑴𝑨𝑯𝑨𝑩𝑼𝑩 𝑹𝑨𝑯𝑴𝑨𝑵";
+            const authorFB = "https://www.facebook.com/www.xnxx.com140";
             const authorInsta = "@mahabub_rahman_404";
-            const status = "𝚂𝙸𝙽𝙶𝙻𝙴..!";
+            const status = "𝑺𝑰𝑵𝑮𝑳𝑬..!";
 
             const now = moment().tz('Asia/Dhaka');
             const date = now.format('dddd, MMMM Do YYYY');
@@ -54,9 +54,9 @@ module.exports = {
                 if (!videoResponse.data || !videoResponse.data.data) {
                     throw new Error("Invalid video API response.");
                 }
+
                 let videoUrl = videoResponse.data.data;
 
-                // Google Drive লিংক হলে সেটাকে `uc` ফরম্যাটে রূপান্তর করা
                 if (videoUrl.includes("drive.google.com")) {
                     const match = videoUrl.match(/[-\w]{25,}/);
                     if (match) {
@@ -65,24 +65,28 @@ module.exports = {
                 }
 
                 message.reply({
-                    body: `╭────────────◊
-├‣ 𝐁𝐨𝐭 & 𝐎𝐰𝐧𝐞𝐫 𝐈𝐧𝐟𝐨𝐫𝐦𝐚𝐭𝐢𝐨𝐧
-├‣ 𝐍𝐚𝐦𝐞: ${authorName}
-├‣ 𝐁𝐨𝐭 𝐍𝐚𝐦𝐞: ${botName}
-├‣ 𝐏𝐫𝐞𝐟𝐢𝐱: ${botPrefix}
-├‣ 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤: ${authorFB}
-├‣ 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦: ${authorInsta}
-├‣ 𝐑𝐞𝐥𝐚𝐭𝐢𝐨𝐧𝐬𝐡𝐢𝐩: ${status}
-├‣ 𝐃𝐚𝐭𝐞: ${date}
-├‣ 𝐓𝐢𝐦𝐞: ${time}
-├‣ 𝐔𝐩𝐭𝐢𝐦𝐞: ${uptimeString}
-╰────────────◊`,
+                    body:
+`╭─╼━━━[ 🌟 𝑩𝑶𝑻 & 𝑨𝑼𝑻𝑯𝑶𝑹 𝑰𝑵𝑭𝑶 🌟 ]━━━╾─╮
+┃
+┃ 👤 𝑶𝒘𝒏𝒆𝒓: ${authorName}
+┃ 🤖 𝑩𝒐𝒕 𝑵𝒂𝒎𝒆: ${botName}
+┃ 🔰 𝑷𝒓𝒆𝒇𝒊𝒙: ${botPrefix}
+┃ ❤️ 𝑹𝒆𝒍𝒂𝒕𝒊𝒐𝒏: ${status}
+┃
+┃ 📆 𝑫𝒂𝒕𝒆: ${date}
+┃ ⏰ 𝑻𝒊𝒎𝒆: ${time}
+┃ ⚙️ 𝑼𝒑𝒕𝒊𝒎𝒆: ${uptimeString}
+┃
+┃ 🌐 𝑭𝒂𝒄𝒆𝒃𝒐𝒐𝒌: ${authorFB}
+┃ 📸 𝑰𝒏𝒔𝒕𝒂: ${authorInsta}
+┃
+╰─╼━━━━━━━━━━━━━━━━━━━━━━━━━━━━╾─╯`,
                     attachment: await global.utils.getStreamFromURL(videoUrl)
                 });
 
             } catch (error) {
                 console.error("Error fetching video:", error);
-                message.reply("❌ Error fetching video. Please try again later.");
+                message.reply("❌ 𝑬𝒓𝒓𝒐𝒓 𝒇𝒆𝒕𝒄𝒉𝒊𝒏𝒈 𝒗𝒊𝒅𝒆𝒐. 𝑷𝒍𝒆𝒂𝒔𝒆 𝒕𝒓𝒚 𝒂𝒈𝒂𝒊𝒏 𝒍𝒂𝒕𝒆𝒓.");
             }
         });
     }
